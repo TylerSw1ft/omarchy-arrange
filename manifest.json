@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "tylersw1ft.arrange",
+  "name": "Arrange",
+  "version": "0.1.0",
+  "author": "TylerSw1ft",
+  "license": "MIT",
+  "description": "A window mode for Hyprland: press Super+A, then move and resize windows with plain arrow keys and a key guide on screen",
+  "kinds": ["service"],
+  "entryPoints": {
+    "service": "Service.qml"
+  }
+}
