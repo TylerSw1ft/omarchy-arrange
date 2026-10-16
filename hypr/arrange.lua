@@ -14,7 +14,9 @@
 --
 -- Other keys do nothing while the mode is on, so nothing leaks into the
 -- window. The mode ends by itself after IDLE_MS without a key.
--- Loaded from ~/.config/hypr/hyprland.lua.
+--
+-- Loaded from ~/.config/hypr/hyprland.lua (tools/install-keys.sh adds the
+-- line). Scripts can drive it too: hyprctl eval 'arrange.enter()'.
 
 local MOVE_STEP = 60     -- px a floating window moves per arrow press
 local RESIZE_STEP = 60   -- px an edge moves per Shift+arrow press
@@ -90,7 +92,8 @@ local function center()
   if w and w.floating then hl.dispatch(hl.dsp.window.center()) end
 end
 
--- Wrap an action so that it also keeps the mode alive.
+-- Wrap an action (a function or a dispatcher) so that it also keeps the
+-- mode alive.
 local function key(fn, ...)
   local args = { ... }
   return function()
@@ -104,40 +107,50 @@ local function done()
   hl.dispatch(hl.dsp.submap("reset"))
 end
 
--- Also reachable from outside, e.g. hyprctl eval 'arrange.push("r")'.
 local function enter()
   if hl.get_current_submap() == SUBMAP then return done() end
   hl.dispatch(hl.dsp.submap(SUBMAP))
   keep_alive()
 end
 
-arrange = { enter = enter, move = move, push = push, center = center, done = done }
+-- For scripts: hyprctl eval 'arrange.enter()', 'arrange.push("r")', ...
+_G.arrange = { enter = enter, done = done, move = move, push = push, center = center }
 
 hl.bind("SUPER + A", enter, { description = "Arrange windows (window mode)" })
 
+local DIRECTIONS = {
+  { key = "LEFT", dir = "l", name = "left" },
+  { key = "RIGHT", dir = "r", name = "right" },
+  { key = "UP", dir = "u", name = "up" },
+  { key = "DOWN", dir = "d", name = "down" },
+}
+
 hl.define_submap(SUBMAP, function()
-  local repeat_ = { repeating = true }
-  for name, dir in pairs({ LEFT = "l", RIGHT = "r", UP = "u", DOWN = "d" }) do
-    hl.bind(name, key(move, dir), repeat_)
-    hl.bind("SHIFT + " .. name, key(push, dir), repeat_)
+  for _, d in ipairs(DIRECTIONS) do
+    hl.bind(d.key, key(move, d.dir),
+      { repeating = true, description = "Arrange: move window " .. d.name })
+    hl.bind("SHIFT + " .. d.key, key(push, d.dir),
+      { repeating = true, description = "Arrange: push window edge " .. d.name })
   end
 
-  hl.bind("T", key(hl.dsp.window.float({ action = "toggle" })))
-  hl.bind("F", key(hl.dsp.window.fullscreen({ mode = "fullscreen" })))
-  hl.bind("M", key(hl.dsp.window.fullscreen({ mode = "maximized" })))
-  hl.bind("S", key(hl.dsp.layout("togglesplit")))
-  hl.bind("C", key(center))
+  hl.bind("T", key(hl.dsp.window.float({ action = "toggle" })), { description = "Arrange: float / tile" })
+  hl.bind("F", key(hl.dsp.window.fullscreen({ mode = "fullscreen" })), { description = "Arrange: full screen" })
+  hl.bind("M", key(hl.dsp.window.fullscreen({ mode = "maximized" })), { description = "Arrange: maximise" })
+  hl.bind("S", key(hl.dsp.layout("togglesplit")), { description = "Arrange: switch split" })
+  hl.bind("C", key(center), { description = "Arrange: centre floating window" })
 
   for n = 1, 9 do
-    hl.bind("code:" .. tostring(n + 9), key(hl.dsp.window.move({ workspace = tostring(n) })))
+    hl.bind("code:" .. tostring(n + 9), key(hl.dsp.window.move({ workspace = tostring(n) })),
+      { description = "Arrange: send window to workspace " .. n })
   end
 
-  hl.bind("TAB", key(hl.dsp.window.cycle_next()))
-  hl.bind("SHIFT + TAB", key(hl.dsp.window.cycle_next({ next = false })))
+  hl.bind("TAB", key(hl.dsp.window.cycle_next()), { description = "Arrange: next window" })
+  hl.bind("SHIFT + TAB", key(hl.dsp.window.cycle_next({ next = false })),
+    { description = "Arrange: previous window" })
 
-  hl.bind("ESCAPE", done)
-  hl.bind("RETURN", done)
-  hl.bind("SUPER + A", done)
+  hl.bind("ESCAPE", done, { description = "Arrange: done" })
+  hl.bind("RETURN", done, { description = "Arrange: done" })
+  hl.bind("SUPER + A", done, { description = "Arrange: done" })
 
   -- Swallow everything else, so a stray letter doesn't land in the window.
   hl.bind("catchall", hl.dsp.no_op())
