@@ -15,3 +15,4 @@ First release.
   Hyprland config block, asking first and keeping backups.
 - `arrange.enter()`, `arrange.push()` and friends for scripts, via
   `hyprctl eval`.
+- Icon (`icon.svg`, `icon.png`).

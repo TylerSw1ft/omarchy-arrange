@@ -1,4 +1,6 @@
-# Arrange
+<p align="center"><img src="icon.png" width="128" alt="Arrange icon"></p>
+
+<h1 align="center">Arrange</h1>
 
 **A window mode for Hyprland on Omarchy.** Press <kbd>Super</kbd>+<kbd>A</kbd>,
 then move and resize the active window with plain arrow keys, with no chords

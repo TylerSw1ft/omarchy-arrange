@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>Arrange</title>
+  <!-- Tile -->
+  <rect x="16" y="16" width="480" height="480" rx="104" fill="#1a1b26"/>
+  <rect x="16.5" y="16.5" width="479" height="479" rx="103.5" fill="none" stroke="#2f3549" stroke-width="1"/>
+
+  <!-- A neighbouring tiled window, dimmed -->
+  <rect x="312" y="150" width="88" height="212" rx="18" fill="none" stroke="#3b4261" stroke-width="12"/>
+
+  <!-- The window being arranged, outlined in the accent -->
+  <rect x="128" y="150" width="164" height="212" rx="20" fill="#24283b" stroke="#7aa2f7" stroke-width="14"/>
+  <line x1="128" y1="196" x2="292" y2="196" stroke="#7aa2f7" stroke-width="10"/>
+
+  <!-- Arrows: it moves and resizes -->
+  <g fill="#c0caf5">
+    <path d="M210 70 l26 32 h-52 z"/>
+    <path d="M210 442 l26 -32 h-52 z"/>
+    <path d="M58 256 l32 -26 v52 z"/>
+    <path d="M454 256 l-32 -26 v52 z"/>
+  </g>
+</svg>
